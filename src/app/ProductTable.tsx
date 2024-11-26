@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { SIZE_ABBREVIATIONS } from "./constants";
+import { RightOutlined, DownOutlined } from "@ant-design/icons";
 
 export default function ProductTable({ products }: { products: any[] }) {
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
@@ -24,13 +26,28 @@ export default function ProductTable({ products }: { products: any[] }) {
     }));
   };
 
+  const isColor = (variantName: string) => {
+    const colors = [
+      "Red",
+      "Blue",
+      "Green",
+      "Yellow",
+      "Black",
+      "White",
+      "Purple",
+      "Orange",
+    ];
+    return colors.includes(variantName);
+  };
+
   return (
     <table className="min-w-full bg-white">
       <thead>
         <tr>
-          <th className="py-2 px-4 border-b w-[35%] bg-gray-100">
+          <th className="py-2 px-4 border-b w-[90%] bg-gray-100">
             Product Name
           </th>
+          <th className="py-2 px-4 border-b w-[10%]">Variant</th>
           <th className="py-2 px-4 border-b w-[10%]">Price</th>
           <th className="py-2 px-4 border-b w-[10%]">Discount</th>
           <th className="py-2 px-4 border-b w-[10%]">Inventory</th>
@@ -49,12 +66,32 @@ export default function ProductTable({ products }: { products: any[] }) {
                 onClick={() => toggleExpand(product.id)}
               >
                 <div className="flex gap-3 items-center">
+                  {expanded[product.id] ? (
+                    <DownOutlined style={{ fontSize: "16px" }} />
+                  ) : (
+                    <RightOutlined style={{ fontSize: "16px" }} />
+                  )}
                   <img
                     src={product.image}
                     alt={product.title}
                     className="w-12 h-12 object-cover rounded-full"
                   />
                   {product.title}
+                </div>
+              </td>
+              <td className="py-2 px-4 border-b">
+                <div className="flex gap-2 justify-center">
+                  {product.primaryVariants.map((pv: any) => (
+                    <div
+                      key={pv.name}
+                      className="w-2 h-2 rounded-full"
+                      style={{
+                        backgroundColor: isColor(pv.name)
+                          ? pv.name.toLowerCase()
+                          : "white",
+                      }}
+                    />
+                  ))}
                 </div>
               </td>
               <td className="py-2 px-4 border-b">{product.price}</td>
@@ -78,7 +115,12 @@ export default function ProductTable({ products }: { products: any[] }) {
                       className="py-2 px-4 border-b cursor-pointer bg-gray-100"
                       onClick={() => toggleSecondaryExpand(product.id, pv.id)}
                     >
-                      <div className="ml-4 flex items-center gap-3">
+                      <div className="ml-12 flex items-center gap-3">
+                        {expandedSecondary[product.id]?.[pv.id] ? (
+                          <DownOutlined style={{ fontSize: "16px" }} />
+                        ) : (
+                          <RightOutlined style={{ fontSize: "16px" }} />
+                        )}
                         <img
                           src={product.image}
                           alt={product.title}
@@ -86,6 +128,16 @@ export default function ProductTable({ products }: { products: any[] }) {
                         />
                         <span>{pv.name}</span>
                       </div>
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: isColor(pv.name)
+                            ? pv.name.toLowerCase()
+                            : "white",
+                        }}
+                      />
                     </td>
                     <td className="py-2 px-4 border-b">{pv.price}</td>
                     <td className="py-2 px-4 border-b">
@@ -102,8 +154,11 @@ export default function ProductTable({ products }: { products: any[] }) {
                     pv.secondaryVariants.map((sv: any, svIndex: number) => (
                       <tr key={svIndex}>
                         <td className="py-2 px-4 border-b pl-16 bg-gray-100">
-                          {sv.name}
+                          <span className="ml-20">
+                            {SIZE_ABBREVIATIONS[sv.name] || sv.name}
+                          </span>
                         </td>
+                        <td className="py-2 px-4 border-b">-</td>
                         <td className="py-2 px-4 border-b">{sv.price}</td>
                         <td className="py-2 px-4 border-b">
                           {sv.discountPercentage}
