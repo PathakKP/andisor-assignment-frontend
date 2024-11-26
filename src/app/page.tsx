@@ -1,22 +1,28 @@
 import { getProducts } from "@/services/api";
 import ProductTable from "./ProductTable";
 import { Suspense } from "react";
+import Header from "./header";
 
 export default async function HomePage() {
   const page = 1;
   const limit = 5;
   const response = await getProducts(page, limit);
-  const products = response.data;
+  console.log("ressponse", response.data.products);
 
-  console.log("products", response);
+  const products = response.data.products;
+  const totalProducts = response.data.total;
 
   return (
-    <div className="p-4 h-full">
-      <h1>Inventory</h1>
+    <div className="h-full flex flex-col">
+      <Header />
       <Suspense fallback={<div>Loading...</div>}>
-        <ProductTable products={products} />
+        <ProductTable
+          initialProducts={products}
+          totalProducts={totalProducts}
+          initialPage={page}
+          pageSize={limit}
+        />
       </Suspense>
-      {/* <button onClick={() => setPage((prev) => prev + 1)}>Next Page</button> */}
     </div>
   );
 }
